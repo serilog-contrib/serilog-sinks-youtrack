@@ -1,4 +1,4 @@
-# Serilog.Sinks.YouTrack [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Sinks.YouTrack.svg?style=flat)](https://www.nuget.org/packages/Serilog.Sinks.YouTrack/)
+# Serilog.Sinks.YouTrack [![Build Status](https://ci.appveyor.com/api/projects/status/rirsqldavl0d15k8?svg=true)](https://ci.appveyor.com/project/jokokko/serilog-sinks-youtrack) [![NuGet Version](http://img.shields.io/nuget/v/Serilog.Sinks.YouTrack.svg?style=flat)](https://www.nuget.org/packages/Serilog.Sinks.YouTrack/)
 Send log events to [YouTrack](https://www.jetbrains.com/youtrack/ "YouTrack").
 
 **Package** [Serilog.Sinks.YouTrack](https://www.nuget.org/packages/Serilog.Sinks.YouTrack) | **Platforms** .NET 4.5, .NET Standard 1.3
