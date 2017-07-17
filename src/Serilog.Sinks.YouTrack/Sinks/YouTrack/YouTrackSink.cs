@@ -3,8 +3,10 @@ using Serilog.Sinks.PeriodicBatching;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Serilog.Debugging;
 using Serilog.Events;
 using Serilog.Sinks.YouTrack.Services;
+// ReSharper disable InvertIf
 
 namespace Serilog.Sinks.YouTrack
 {
@@ -54,7 +56,24 @@ namespace Serilog.Sinks.YouTrack
                     configuration.SummaryFormatter.Format(e, writerSummary);
                     configuration.DescriptionFormatter.Format(e, writerDescription);
                     
-                    await reporter.CreateIssue(configuration.Project, writerSummary.ToString(), writerDescription.ToString(), configuration.IssueTypeResolver(e));
+                    var issue = await reporter.CreateIssue(configuration.Project, writerSummary.ToString(), writerDescription.ToString(), configuration.IssueTypeResolver(e));
+
+                    SelfLog.WriteLine($"Created issue {issue}");
+
+                    if (configuration.IssueCreated.Count > 0)
+                    {
+                        foreach (var n in configuration.IssueCreated)
+                        {                            
+                            try
+                            {
+                                var cmd = n.Item1(e, issue);
+                                await reporter.ExecuteAgainstIssue(issue, cmd.Item1, cmd.Item2).ConfigureAwait(false);
+                            } catch (Exception ex) when (n.Item2)
+                            {
+                                SelfLog.WriteLine(ex.Message);
+                            }
+                        }
+                    }
                 }
             }
         }

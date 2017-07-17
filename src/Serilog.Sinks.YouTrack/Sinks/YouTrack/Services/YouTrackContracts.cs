@@ -9,14 +9,15 @@ namespace Serilog.Sinks.YouTrack.Services
         public readonly string Value;
         private bool Equals(YouTrackContracts other)
         {
-            return string.Equals((string) Value, (string) other.Value);
+            return string.Equals(Value, other.Value);
         }
 
         public override bool Equals(object obj)
         {
             if (object.ReferenceEquals(null, obj)) return false;
             if (object.ReferenceEquals(this, obj)) return true;
-            return obj is YouTrackContracts && Equals((YouTrackContracts)obj);
+            var a = obj as YouTrackContracts;
+            return a != null && Equals(a);
         }
 
         public override int GetHashCode()

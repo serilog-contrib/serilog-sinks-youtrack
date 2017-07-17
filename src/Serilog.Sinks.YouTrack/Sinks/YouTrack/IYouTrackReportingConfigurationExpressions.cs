@@ -17,7 +17,7 @@ namespace Serilog.Sinks.YouTrack
         /// <summary>
         /// Specify issue type to use, e.g. Bug.
         /// </summary>
-        /// <param name="issueType">YouTrack issue type.</param>
+        /// <param name="issueType">YouTrack issue type.</param>        
         IYouTrackReportingConfigurationExpressions UseIssueType(string issueType);
         /// <summary>
         /// Specify issue type to use based on provided LogEvent.
@@ -37,6 +37,14 @@ namespace Serilog.Sinks.YouTrack
         /// </summary>
         /// <param name="template">Template to use.</param>
         /// <param name="formatProvider">Format provider to use.</param>        
-        IYouTrackReportingConfigurationExpressions FormatDescriptionWith(string template, IFormatProvider formatProvider = null);        
+        IYouTrackReportingConfigurationExpressions FormatDescriptionWith(string template, IFormatProvider formatProvider = null);
+        /// <summary>
+        /// When a new issue is logged in YouTrack, execute any commands against it.
+        /// <see href="https://www.jetbrains.com/help/youtrack/incloud/Command-Reference.html">YouTrack Command Reference</see>.
+        /// </summary>
+        /// <param name="executeAgainstIssue">Func executed with the source LogEvent and issue uri. Should return a tuple of YouTrack command(s) with an optional comment.</param>
+        /// <param name="failSilently">If command execution fails, don't retry logging.</param>
+        /// <remarks>Can be used to register multiple invocations.</remarks>
+        IYouTrackReportingConfigurationExpressions OnIssueCreated(Func<LogEvent, Uri, Tuple<string, string>> executeAgainstIssue, bool failSilently = true);
     }
 }

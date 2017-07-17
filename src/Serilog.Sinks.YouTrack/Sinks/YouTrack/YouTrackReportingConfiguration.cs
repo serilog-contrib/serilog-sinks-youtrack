@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
@@ -12,8 +13,11 @@ namespace Serilog.Sinks.YouTrack
         
         public string Project { get; private set; }        
         public ITextFormatter SummaryFormatter { get; private set; }
-        public ITextFormatter DescriptionFormatter { get; private set; }
-        
+        public ITextFormatter DescriptionFormatter { get; private set; }       
+        public IReadOnlyCollection<Tuple<Func<LogEvent, Uri, Tuple<string, string>>, bool>> IssueCreated { get; private set; }
+
+        private readonly List<Tuple<Func<LogEvent, Uri, Tuple<string, string>>, bool>> onIssueCreated = new List<Tuple<Func<LogEvent, Uri, Tuple<string, string>>, bool>>();
+
         public IYouTrackReportingConfigurationExpressions UseProject(string project)
         {
             if (string.IsNullOrEmpty(project))
@@ -22,6 +26,8 @@ namespace Serilog.Sinks.YouTrack
             }
 
             Project = project;
+
+            IssueCreated = onIssueCreated.AsReadOnly();
 
             return this;
         }
@@ -66,6 +72,18 @@ namespace Serilog.Sinks.YouTrack
             }
 
             DescriptionFormatter = new MessageTemplateTextFormatter(template, formatProvider);
+
+            return this;
+        }
+        
+        public IYouTrackReportingConfigurationExpressions OnIssueCreated(Func<LogEvent, Uri, Tuple<string, string>> executeAgainstIssue, bool failSilently = true)
+        {
+            if (executeAgainstIssue == null)
+            {
+                throw new ArgumentNullException(nameof(executeAgainstIssue));
+            }
+             
+            onIssueCreated.Add(Tuple.Create(executeAgainstIssue, failSilently));
 
             return this;
         }

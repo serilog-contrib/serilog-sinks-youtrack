@@ -76,7 +76,8 @@ namespace Serilog.Sinks.YouTrack.Services
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new InvalidOperationException($"{response.StatusCode}: {response.ReasonPhrase}");
+                        throw new InvalidOperationException(
+                            $"Authenticating through {response.RequestMessage.RequestUri}. Response {(int) response.StatusCode}: {response.ReasonPhrase}{Environment.NewLine}Body: {await response.Content.ReadAsStringAsync()}");
                     }
 
                     return true;
@@ -89,7 +90,7 @@ namespace Serilog.Sinks.YouTrack.Services
             {
                 BaseAddress = youTrackUri
             };
-       
+
             // ReSharper disable once ImplicitlyCapturedClosure
             void OnDispose()
             {
@@ -112,7 +113,7 @@ namespace Serilog.Sinks.YouTrack.Services
 
             onDispose = OnDispose;
         }
-       
+
         /// <summary>
         /// Create new issue in YouTrack.
         /// </summary>
@@ -150,7 +151,8 @@ namespace Serilog.Sinks.YouTrack.Services
             {
                 if (response.StatusCode != HttpStatusCode.Created)
                 {
-                    throw new InvalidOperationException($"{response.StatusCode}: {response.ReasonPhrase}");
+                    throw new InvalidOperationException(
+                        $"Creating issue through {response.RequestMessage.RequestUri}. Response {(int) response.StatusCode}: {response.ReasonPhrase}{Environment.NewLine}Body: {await response.Content.ReadAsStringAsync()}");
                 }
 
                 uri = response.Headers.Location;
@@ -158,19 +160,35 @@ namespace Serilog.Sinks.YouTrack.Services
 
             if (issueType != null)
             {
-                using (var response = await client.PostAsync($"{uri.PathAndQuery}/execute", new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("command", $"type {issueType}"),
-                })).ConfigureAwait(false))
-                {
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        throw new InvalidOperationException($"{response.StatusCode}: {response.ReasonPhrase}");
-                    }
-                }
+                await ExecuteAgainstIssue(uri, $"type {issueType}").ConfigureAwait(false);
             }
 
             return uri;
+        }
+
+        /// <summary>
+        /// Execute YouTrack command against issue.
+        /// <see href="https://www.jetbrains.com/help/youtrack/incloud/Command-Reference.html">YouTrack Command Reference</see>.
+        /// </summary>
+        /// <param name="issue">Issue uri from CreateIssue.</param>
+        /// <param name="command">Command to execute.</param>
+        /// <param name="comment">Comment to add.</param>
+        /// <returns>Uri of the provided issue.</returns>
+        public async Task<Uri> ExecuteAgainstIssue(Uri issue, string command, string comment = null)
+        {
+            var cmd = new KeyValuePair<string, string>("command", command);
+            var cmds = !string.IsNullOrEmpty(comment)
+                ? new[] {cmd, new KeyValuePair<string, string>("comment", comment)}
+                : new[] {cmd};
+
+            using (var response = await client.PostAsync($"{issue.PathAndQuery}/execute", new FormUrlEncodedContent(cmds)).ConfigureAwait(false))
+            {
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new InvalidOperationException($@"Executing command ""{command}"" through {response.RequestMessage.RequestUri}. Response {(int)response.StatusCode}: {response.ReasonPhrase}{Environment.NewLine}Body: {await response.Content.ReadAsStringAsync()}");
+                }
+                return issue;
+            }
         }
 
         /// <summary>

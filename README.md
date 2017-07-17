@@ -27,6 +27,8 @@ var log = new LoggerConfiguration().WriteTo.
 	c => c.
         UseProject("PROJECT").                    
         UseIssueType(e => e.Exception != null ? "Bug" : "Task").
+ 		// Execute YouTrack command against created issue
+        OnIssueCreated((e, uri) => Tuple.Create("Priority Major", "Bumping priority")).
         FormatSummaryWith("{Timestamp:yyyy-MM-dd} [{Level}] {Message}").
         FormatDescriptionWith("{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}")).
 	CreateLogger();

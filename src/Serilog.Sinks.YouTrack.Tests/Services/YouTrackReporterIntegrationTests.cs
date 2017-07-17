@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Security;
 using System.Threading.Tasks;
 using Serilog.Sinks.YouTrack.Services;
 using Serilog.Sinks.YouTrack.Tests.Harness;
@@ -7,13 +6,13 @@ using Xunit;
 
 namespace Serilog.Sinks.YouTrack.Tests.Services
 {
-    public sealed class YouTrackReporterIntegrationTests : IntegrationTest
+    public sealed class YouTrackReporterIntegrationTests : IntegrationTest, IDisposable
     {
-        private readonly YouTrackReporter sut;
+        private readonly WrappedYouTrackReporter sut;
 
         public YouTrackReporterIntegrationTests()
-        {            
-            sut = Reporter;
+        {
+            sut = Reporter();
         }
         
         [Theory]
@@ -21,24 +20,25 @@ namespace Serilog.Sinks.YouTrack.Tests.Services
         public async Task CanReportIssue(string project, string summary, string description, string type)
         {            
             await sut.CreateIssue(project, summary, description, type);            
-        }
-        
-        [Fact]
-        public void MustProvideCredentialsAndEndpoint()
-        {
-            Assert.Throws<ArgumentException>(() => new YouTrackReporter(null, "abc", new Uri("url:none")));
-            Assert.Throws<ArgumentNullException>(() => new YouTrackReporter("abc", (SecureString)null, new Uri("url:none")));
-            Assert.Throws<ArgumentNullException>(() => new YouTrackReporter("abc", "abc", null));
+
+            Assert.NotEmpty(sut.CreatedIssues);
         }
 
         [Fact]
         public void CanAuthImmediately()
         {
-            Assert.Throws<AggregateException>(() =>
+            var e = Assert.Throws<AggregateException>(() =>
             {
                 // ReSharper disable once ObjectCreationAsStatement
                 new YouTrackReporter("admin", "admin", new Uri(YouTrackCredentials["host"]), true);
             });
+
+            Assert.True(e.ToString().IndexOf("403", StringComparison.Ordinal) > -1);
+        }
+
+        public void Dispose()
+        {
+            sut.Wrapped.Dispose();
         }
     }
 }

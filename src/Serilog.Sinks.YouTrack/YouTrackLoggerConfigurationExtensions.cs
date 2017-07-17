@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Security;
 using Serilog.Configuration;
+using Serilog.Events;
 using Serilog.Sinks.YouTrack;
 using Serilog.Sinks.YouTrack.Services;
 
@@ -66,13 +67,14 @@ namespace Serilog
         /// <param name="user">Username that is used to authenticate to YouTrack.</param>
         /// <param name="password">Password that is used to authenticate to YouTrack.</param>        
         /// <param name="reportingConfiguration">Configure reporting parameters such as YouTrack project, issue types and templates. Project needs to always be configured.</param>
+        /// <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>/// 
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
         public static LoggerConfiguration YouTrack(this LoggerSinkConfiguration sinkConfiguration, Uri youTrackEndpoint,
             string user, string password,
-            Action<IYouTrackReportingConfigurationExpressions> reportingConfiguration)
+            Action<IYouTrackReportingConfigurationExpressions> reportingConfiguration, LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
             return YouTrack(sinkConfiguration, youTrackEndpoint, user, SecureStringHelper.ToSecureString(password),
-                reportingConfiguration);
+                reportingConfiguration, restrictedToMinimumLevel);
         }
 
         /// <summary>
@@ -83,8 +85,9 @@ namespace Serilog
         /// <param name="user">Username that is used to authenticate to YouTrack.</param>
         /// <param name="password">Password that is used to authenticate to YouTrack.</param>        
         /// <param name="reportingConfiguration">Configure reporting parameters such as YouTrack project, issue types and templates. Project needs to always be configured.</param>
+        /// <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
-        public static LoggerConfiguration YouTrack(this LoggerSinkConfiguration sinkConfiguration, Uri youTrackEndpoint, string user, SecureString password, Action<IYouTrackReportingConfigurationExpressions> reportingConfiguration)
+        public static LoggerConfiguration YouTrack(this LoggerSinkConfiguration sinkConfiguration, Uri youTrackEndpoint, string user, SecureString password, Action<IYouTrackReportingConfigurationExpressions> reportingConfiguration, LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
             if (sinkConfiguration == null)
             {
@@ -95,7 +98,7 @@ namespace Serilog
 
             var sink = new YouTrackSink(reporter, reportingConfiguration, DefaultBatchPostingLimit, DefaultPeriod);
 
-            return sinkConfiguration.Sink(sink);
+            return sinkConfiguration.Sink(sink, restrictedToMinimumLevel);
         }
 
         /// <summary>
@@ -106,8 +109,9 @@ namespace Serilog
         /// <param name="reportingConfiguration">Configure reporting parameters such as YouTrack project, issue types and templates. Project needs to always be configured.</param>
         /// <param name="batchSizeLimit">The maximum number of events to post in a single batch.</param>
         /// <param name="period">The time to wait between checking for event batches.</param>
+        /// <param name="restrictedToMinimumLevel">The minimum log event level required in order to write an event to the sink.</param>
         /// <returns>Logger configuration, allowing configuration to continue.</returns>
-        public static LoggerConfiguration YouTrack(this LoggerSinkConfiguration sinkConfiguration, IYouTrackReporter reporter, Action<IYouTrackReportingConfigurationExpressions> reportingConfiguration, int batchSizeLimit = DefaultBatchPostingLimit, TimeSpan? period = null)
+        public static LoggerConfiguration YouTrack(this LoggerSinkConfiguration sinkConfiguration, IYouTrackReporter reporter, Action<IYouTrackReportingConfigurationExpressions> reportingConfiguration, int batchSizeLimit = DefaultBatchPostingLimit, TimeSpan? period = null, LogEventLevel restrictedToMinimumLevel = LevelAlias.Minimum)
         {
             if (sinkConfiguration == null)
             {
@@ -128,7 +132,7 @@ namespace Serilog
 
             var sink = new YouTrackSink(reporter, reportingConfiguration, batchSizeLimit, period.Value);
 
-            return sinkConfiguration.Sink(sink);
+            return sinkConfiguration.Sink(sink, restrictedToMinimumLevel);
         }
     }
 }

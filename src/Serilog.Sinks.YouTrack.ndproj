@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <NDepend AppName="Serilog.Sinks.YouTrack" Platform="DotNet" FileWrittenByProductVersion="2017.2.1.8955">
-  <OutputDir KeepXmlFiles="False">..\build_artifacts\NDependOut</OutputDir>
+  <OutputDir KeepXmlFiles="False">..\artifacts\NDependOut</OutputDir>
   <Assemblies>
     <Name>Serilog.Sinks.YouTrack</Name>
   </Assemblies>

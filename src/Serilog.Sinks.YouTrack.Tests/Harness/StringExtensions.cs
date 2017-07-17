@@ -6,9 +6,9 @@ namespace Serilog.Sinks.YouTrack.Tests.Harness
     {
         public static SecureString ToSecureString(this string self)
         {
-            SecureString knox = new SecureString();
-            char[] chars = self.ToCharArray();
-            foreach (char c in chars)
+            var knox = new SecureString();
+            var chars = self.ToCharArray();
+            foreach (var c in chars)
             {
                 knox.AppendChar(c);
             }

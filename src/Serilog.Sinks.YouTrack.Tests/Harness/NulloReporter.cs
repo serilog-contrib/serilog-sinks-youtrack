@@ -10,5 +10,10 @@ namespace Serilog.Sinks.YouTrack.Tests.Harness
         {
             return Task.FromResult(new Uri("uri:none"));
         }
+
+        public Task<Uri> ExecuteAgainstIssue(Uri issue, string command, string comment = null)
+        {
+            return Task.FromResult(issue);
+        }
     }
 }
