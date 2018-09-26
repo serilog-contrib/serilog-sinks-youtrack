@@ -72,7 +72,52 @@ namespace Serilog.Sinks.YouTrack.Tests
             Assert.NotEmpty(sut.reporter.CreatedIssues);
         }
 
-        [Fact]
+	    [Fact]
+	    public void CanLogWithPriority()
+	    {
+		    var selfLog = new StringBuilder();
+		    Debugging.SelfLog.Enable(s => selfLog.Append(s));
+		    using (var mySut = new LoggerConfiguration()
+			    .WriteTo.YouTrack(new Uri(YouTrackCredentials["host"]), YouTrackCredentials["login"], YouTrackCredentials["password"],
+				    c => { c.UseProject(Project).UsePriority("Critical"); }).CreateLogger())
+		    {
+			    mySut.Error(new Exception("Test"), "test");
+		    }
+		    Assert.True(selfLog.ToString().IndexOf("Created issue", StringComparison.Ordinal) > -1);
+		}
+
+	    [Fact]
+	    public void CanLogWithCommandAndNondefaultFieldValue()
+	    {
+		    var selfLog = new StringBuilder();
+		    Debugging.SelfLog.Enable(s => selfLog.Append(s));
+		    using (var mySut = new LoggerConfiguration()
+			    .WriteTo.YouTrack(new Uri(YouTrackCredentials["host"]), YouTrackCredentials["login"], YouTrackCredentials["password"],
+				    c => { c.UseProject(Project).OnIssueCreated((e, u) => "Subsystem infrastructure"); }).CreateLogger())
+		    {
+			    mySut.Error(new Exception("Test"), "test");
+		    }
+		    Assert.True(selfLog.ToString().IndexOf("Created issue", StringComparison.Ordinal) > -1);
+	    }
+
+
+		[Fact]
+	    public void CanLogWithCommandWithoutComment()
+	    {
+		    var selfLog = new StringBuilder();
+		    Debugging.SelfLog.Enable(s => selfLog.Append(s));
+		    using (var mySut = new LoggerConfiguration()
+			    .WriteTo.YouTrack(new Uri(YouTrackCredentials["host"]), YouTrackCredentials["login"], YouTrackCredentials["password"],
+				    c => { c.UseProject(Project).OnIssueCreated((e, u) => "Priority Minor"); }).CreateLogger())
+		    {
+			    mySut.Error(new Exception("Test"), "test");
+		    }
+		    Assert.True(selfLog.ToString().IndexOf("Created issue", StringComparison.Ordinal) > -1);
+	    }
+
+
+
+		[Fact]
         public void CanUseOverloadsToCreateLoggerFromCredentials()
         {
             var selfLog = new StringBuilder();

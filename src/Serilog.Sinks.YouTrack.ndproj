@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<NDepend AppName="Serilog.Sinks.YouTrack" Platform="DotNet" FileWrittenByProductVersion="2017.2.1.8955">
+<NDepend AppName="Serilog.Sinks.YouTrack" Platform="DotNet" FileWrittenByProductVersion="2018.2.1.9119">
   <OutputDir KeepXmlFiles="False">..\artifacts\NDependOut</OutputDir>
   <Assemblies>
     <Name>Serilog.Sinks.YouTrack</Name>
@@ -19,7 +19,7 @@
   </FrameworkAssemblies>
   <Dirs>
     <Dir>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319</Dir>
-    <Dir>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\WPF</Dir>
+    <Dir>C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\WPF</Dir>    
     <Dir>.\Serilog.Sinks.YouTrack\bin\debug\netstandard1.4</Dir>
     <Dir>.\Serilog.Sinks.YouTrack.Tests\bin\debug\netcoreapp1.1</Dir>
   </Dirs>

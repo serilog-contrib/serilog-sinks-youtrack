@@ -70,7 +70,25 @@ namespace Serilog.Sinks.YouTrack.Tests
             Assert.Equal("Bump priority", issueComment);
         }
 
-        [Fact]
+	    [Fact]
+	    public void PriorityPropagatesToReporter()
+	    {
+		    var issueCommand = string.Empty;
+		    using (var sut = new LoggerConfiguration()
+			    .WriteTo.YouTrack(new DummyReporter(onExecuteAgainstIssue: (_, cmd, comment) =>
+			    {
+				    issueCommand = cmd;
+			    }), c =>
+				    c.UseProject("abc").UsePriority("Major")).CreateLogger())
+		    {
+			    sut.Error(new Exception(""), "efg");
+		    }
+
+		    Assert.Equal("Priority Major", issueCommand);		    
+	    }
+
+
+		[Fact]
         public void SinkRespectsConfiguredMinimumErrorLevel()
         {
             var nIssues = 0;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
+using Serilog.Sinks.YouTrack.Services;
 
 namespace Serilog.Sinks.YouTrack
 {
@@ -88,7 +89,41 @@ namespace Serilog.Sinks.YouTrack
             return this;
         }
 
-        public void Build()
+	    public IYouTrackReportingConfigurationExpressions OnIssueCreated(Func<LogEvent, Uri, string> executeAgainstIssue, bool failSilently = true)
+	    {
+			if (executeAgainstIssue == null)
+		    {
+			    throw new ArgumentNullException(nameof(executeAgainstIssue));
+		    }
+
+		    Tuple<string, string> Partial(LogEvent e, Uri u) => Tuple.Create(executeAgainstIssue(e, u), (string) null);
+
+		    onIssueCreated.Add(Tuple.Create(new Func<LogEvent, Uri, Tuple<string, string>>(Partial), failSilently));
+
+		    return this;
+		}
+
+	    public IYouTrackReportingConfigurationExpressions UsePriority(string priority)
+	    {
+			if (string.IsNullOrEmpty(priority))
+			{
+				throw new ArgumentException(nameof(priority));
+			}
+
+		    return UsePriority(_ => priority);
+	    }
+
+		public IYouTrackReportingConfigurationExpressions UsePriority(Func<LogEvent, string> priority)
+		{
+			if (priority == null)
+			{
+				throw new ArgumentNullException(nameof(priority));
+			}
+
+			return OnIssueCreated((e, u) => $"{YouTrackContracts.PriorityField} {priority(e)}");
+		}
+
+	    public void Build()
         {
             if (string.IsNullOrEmpty(Project))
             {

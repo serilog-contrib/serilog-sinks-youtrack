@@ -5,8 +5,10 @@ namespace Serilog.Sinks.YouTrack.Services
         public static readonly YouTrackContracts Issue = new YouTrackContracts("/rest/issue");
         public static readonly YouTrackContracts Auth = new YouTrackContracts("/rest/user/login");
         public static readonly YouTrackContracts AuthCookie = new YouTrackContracts("jetbrains.charisma.main.security.PRINCIPAL");
+	    public static readonly YouTrackContracts PriorityField = new YouTrackContracts("Priority");
 
-        public readonly string Value;
+
+		public readonly string Value;
         private bool Equals(YouTrackContracts other)
         {
             return string.Equals(Value, other.Value);

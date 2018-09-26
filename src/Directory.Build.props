@@ -2,9 +2,9 @@
 <Project>
   <PropertyGroup>
   <Title>Serilog.Sinks.YouTrack</Title>
-    <Version>0.2.0.0</Version>
-    <FileVersion>0.2.0.0</FileVersion>
-    <InformationalVersion>0.2.0.0</InformationalVersion>
+    <Version>1.0.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <InformationalVersion>1.0.0.0</InformationalVersion>
     <RepositoryType>git</RepositoryType>    
   </PropertyGroup>
 </Project>

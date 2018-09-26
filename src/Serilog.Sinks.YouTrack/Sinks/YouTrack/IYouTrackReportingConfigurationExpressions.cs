@@ -46,5 +46,23 @@ namespace Serilog.Sinks.YouTrack
         /// <param name="failSilently">If command execution fails, don't retry logging.</param>
         /// <remarks>Can be used to register multiple invocations.</remarks>
         IYouTrackReportingConfigurationExpressions OnIssueCreated(Func<LogEvent, Uri, Tuple<string, string>> executeAgainstIssue, bool failSilently = true);
-    }
+	    /// <summary>
+		/// When a new issue is logged in YouTrack, execute any commands against it.
+		/// <see href="https://www.jetbrains.com/help/youtrack/incloud/Command-Reference.html">YouTrack Command Reference</see>.
+		/// </summary>
+		/// <param name="executeAgainstIssue">Func executed with the source LogEvent and issue uri. Should return YouTrack command(s).</param>
+		/// <param name="failSilently">If command execution fails, don't retry logging.</param>
+		/// <remarks>Can be used to register multiple invocations.</remarks>
+		IYouTrackReportingConfigurationExpressions OnIssueCreated(Func<LogEvent, Uri, string> executeAgainstIssue, bool failSilently = true);
+		/// <summary>
+		/// Customize issue priority.
+		/// </summary>
+		/// <param name="priority">Issue priority</param>		
+		IYouTrackReportingConfigurationExpressions UsePriority(string priority);
+		/// <summary>
+		/// Customize issue priority.
+		/// </summary>
+		/// <param name="priority">Func that returns YouTrack issue priority.</param>		
+		IYouTrackReportingConfigurationExpressions UsePriority(Func<LogEvent, string> priority);
+	}
 }
